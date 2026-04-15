@@ -1,6 +1,7 @@
 // =====================================
 // CallDesk Backend (Node + Socket.IO + Auth)
 // =====================================
+require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -25,7 +26,10 @@ app.get('/', (req, res) => {
 app.use(express.static("models/public"));
 
 // ================= DATABASE =================
-mongoose.connect("mongodb://127.0.0.1:27017/calldesk");
+const mongoURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/calldesk";
+mongoose.connect(mongoURI)
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.error("MongoDB connection error:", err));
 
 const CustomerSchema = new mongoose.Schema({
   name: String,
@@ -282,6 +286,7 @@ io.on("connection", (socket) => {
 });
 
 // ================= START =================
-server.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
