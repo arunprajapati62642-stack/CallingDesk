@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CallDesk — Redirecting...</title>
+  <script>
+    window.addEventListener('load', () => {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      if (!token || !user) {
+        window.location.href = '/login.html';
+        return;
+      }
+      const userData = JSON.parse(user);
+      window.location.href = userData.role === 'developer' ? '/queue.html' : '/customer.html';
+    });
+  </script>
+</head>
+<body>
+  <div style="text-align:center;padding:50px;font-family:sans-serif;">
+    <h1>🎧 CallDesk</h1>
+    <p>Loading... Please wait.</p>
+  </div>
+</body>
+</html>

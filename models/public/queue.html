@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CallDesk — Developer Queue Manager</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #667eea;
+      --secondary: #764ba2;
+      --success: #3c3;
+      --warning: #ff9800;
+      --danger: #c33;
+      --muted: #999;
+      --light: #f5f5f5;
+      --dark: #333;
+    }
+
+    body {
+      font-family: "Outfit", sans-serif;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      min-height: 100vh;
+      color: var(--dark);
+    }
+
+    header {
+      background: white;
+      padding: 16px 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-mark {
+      font-size: 28px;
+    }
+
+    .logo-name {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .logo-name span {
+      color: var(--primary);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .hstat {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hstat b {
+      color: var(--primary);
+      font-size: 18px;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: #3c3;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .user-info {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .user-info .name {
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .logout-btn {
+      background: var(--light);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+
+    .logout-btn:hover {
+      background: #ddd;
+    }
+
+    .page-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 30px 20px;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .page-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: var(--light);
+      color: var(--dark);
+    }
+
+    .btn-secondary:hover {
+      background: #e5e5e5;
+    }
+
+    .next-card {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      padding: 32px;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .next-avatar {
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 16px;
+      font-weight: 700;
+    }
+
+    .next-name {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .next-issue {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 12px;
+    }
+
+    .next-row {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-bottom: 4px;
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .action-button {
+      min-width: 120px;
+      max-width: 100%;
+      text-align: center;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-decoration: none;
+    }
+
+    .action-button.call {
+      background: #34a8e0;
+      color: white;
+    }
+
+    .action-button.email {
+      background: #dd4b39;
+      color: white;
+    }
+
+    .action-button.solve {
+      background: #3c3;
+      color: white;
+    }
+
+    .action-button:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .queue-item {
+      background: var(--light);
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--primary);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+      cursor: pointer;
+    }
+
+    .queue-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+      background: #f7f9ff;
+    }
+
+    .queue-item.selected {
+      background: #eef4ff;
+      border-color: #3b82f6;
+      box-shadow: 0 16px 40px rgba(59, 130, 246, 0.12);
+    }
+
+    .queue-item.high {
+      border-left-color: var(--danger);
+      background: #fff0f0;
+    }
+
+    .queue-item.low {
+      border-left-color: #0099cc;
+      background: #f0f8ff;
+    }
+
+    .queue-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .queue-item-name {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--dark);
+    }
+
+    .queue-item-priority {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(102, 126, 234, 0.2);
+      color: var(--primary);
+    }
+
+    .queue-item-priority.high {
+      background: rgba(204, 51, 51, 0.2);
+      color: var(--danger);
+    }
+
+    .queue-item-priority.low {
+      background: rgba(0, 153, 204, 0.2);
+      color: #0099cc;
+    }
+
+    .queue-item-issue {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .queue-item-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #999;
+    }
+
+    .stack-card {
+      background: var(--light);
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    .stack-head {
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 4px;
+    }
+
+    .stack-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .stacks-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .st-col {
+      background: white;
+      padding: 12px;
+      border-radius: 6px;
+      border: 2px solid #e5e5e5;
+    }
+
+    .st-lbl {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .st-lbl.in {
+      background: rgba(102, 126, 234, 0.2);
+      color: var(--primary);
+    }
+
+    .st-lbl.out {
+      background: rgba(52, 168, 224, 0.2);
+      color: #34a8e0;
+    }
+
+    .st-note {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .served-item {
+      background: rgba(60, 204, 51, 0.1);
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      border-left: 4px solid var(--success);
+    }
+
+    .served-item-name {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 3px;
+    }
+
+    .served-item-time {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .slabel {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      margin-top: 20px;
+    }
+
+    .slabel:first-child {
+      margin-top: 0;
+    }
+
+    .status-message {
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+
+    .status-message.success {
+      background: #efe;
+      color: var(--success);
+      border-left: 4px solid var(--success);
+    }
+
+    .status-message.error {
+      background: #fee;
+      color: var(--danger);
+      border-left: 4px solid var(--danger);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <div class="logo-mark">🎧</div>
+      <div class="logo-name">Call<span>Desk</span></div>
+    </div>
+    <div class="header-right">
+      <div class="hstat">
+        <div class="live-dot"></div>
+        Queue: <b id="hq">0</b>
+      </div>
+      <div class="hstat">✔ Served: <b id="hs">0</b></div>
+      <div class="user-info">
+        👨‍💼 <span class="name" id="user-name">Developer</span>
+      </div>
+      <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+  </header>
+
+  <div class="page-container">
+    <!-- LEFT PANEL: QUEUE -->
+    <div>
+      <div class="card">
+        <div class="card-title">📋 Waiting Queue</div>
+        <div id="queue-list">
+          <div class="empty">
+            <div class="empty-icon">📭</div>
+            Queue is empty
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: NEXT CUSTOMER & ACTIONS -->
+    <div>
+      <div class="card">
+        <div class="slabel">Next Customer</div>
+        <div id="next-section">
+          <div style="text-align:center;padding:22px;color:var(--muted);font-size:13px;font-family:'JetBrains Mono',monospace;">
+            // queue is empty
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="serve-btn" onclick="serveNext()" disabled style="width: 100%;">
+          ✅ Serve Next Customer
+        </button>
+
+        <div id="serve-message"></div>
+
+        <!-- STACK VISUALIZER -->
+        <div class="stack-card">
+          <div class="stack-head">🗂 Queue Algorithm</div>
+          <div class="stack-sub">// Using Two-Stack Queue Implementation</div>
+          <div class="stacks-row">
+            <div class="st-col">
+              <div class="st-lbl in">IN Stack</div>
+              <div id="in-stack" style="min-height:40px;"></div>
+            </div>
+            <div class="st-col">
+              <div class="st-lbl out">OUT Stack</div>
+              <div id="out-stack" style="min-height:40px;"></div>
+            </div>
+          </div>
+          <div class="st-note">
+            📥 enqueue → push to inStack<br>
+            📤 dequeue → pop from outStack<br>
+            ♻️ outStack empty? → transfer inStack<br>
+            ⏱ Result: FIFO order maintained!
+          </div>
+        </div>
+
+        <!-- SERVED HISTORY -->
+        <div class="slabel">Recently Served</div>
+        <div id="served-list">
+          <div style="text-align:center;padding:14px;color:var(--muted);font-size:12px;font-family:'JetBrains Mono',monospace;">
+            // no customers served yet
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:3000/api';
+    let currentUser = null;
+    let selectedCustomerId = null;
+    let lastQueueData = null;
+
+    // Check authentication
+    window.addEventListener('load', () => {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+
+      if (!token || !user) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      const userData = JSON.parse(user);
+      
+      // Only developers can access this page
+      if (userData.role !== 'developer') {
+        window.location.href = '/customer.html';
+        return;
+      }
+
+      currentUser = userData;
+      document.getElementById('user-name').textContent = userData.name;
+
+      // Load queue
+      loadQueue();
+    });
+
+    async function loadQueue() {
+      try {
+        const res = await fetch(`${API}/queue`);
+        const data = await res.json();
+
+        if (data.success) {
+          renderQueue(data);
+        }
+      } catch (err) {
+        console.error('Error loading queue:', err);
+      }
+    }
+
+    function renderQueue(data) {
+      lastQueueData = data;
+      if (selectedCustomerId && !data.customers.some(c => c._id === selectedCustomerId)) {
+        selectedCustomerId = null;
+      }
+
+      document.getElementById('hq').textContent = data.queueSize;
+      document.getElementById('serve-btn').disabled = data.queueSize === 0;
+      document.getElementById('serve-btn').textContent = selectedCustomerId ? '✅ Serve Selected Customer' : '✅ Serve Next Customer';
+
+      renderNext(data.nextCustomer);
+      renderList(data.customers);
+      renderServed(data.served);
+    }
+
+    function renderNext(customer) {
+      const sec = document.getElementById('next-section');
+      if (!customer) {
+        sec.innerHTML = `<div style="text-align:center;padding:22px;color:var(--muted);font-size:13px;font-family:'JetBrains Mono',monospace;">// queue is empty</div>`;
+        return;
+      }
+
+      const waitTime = Math.floor((Date.now() - new Date(customer.createdAt).getTime()) / 1000);
+      const mailSubject = encodeURIComponent(`CallDesk support for ${customer.name}`);
+      const mailBody = encodeURIComponent(`Customer: ${customer.name}\nPhone: ${customer.phone}\nIssue: ${customer.issue}`);
+      const mailLink = `https://mail.google.com/mail/?view=cm&fs=1&su=${mailSubject}&body=${mailBody}`;
+
+      sec.innerHTML = `
+        <div class="next-card">
+          <div class="next-avatar">${customer.name[0].toUpperCase()}</div>
+          <div class="next-name">${customer.name}</div>
+          <div class="next-issue">${customer.issue}</div>
+          <div class="next-row">📱 ${customer.phone}</div>
+          ${customer.email ? `<div class="next-row">✉️ ${customer.email}</div>` : ''}
+          <div class="next-row">⏱ Waiting: ${formatWaitTime(waitTime)}</div>
+          <div class="next-row">🎯 Priority: <strong>${customer.priority.toUpperCase()}</strong></div>
+          <div class="action-row">
+            <button class="action-button solve" onclick="markProblemSolved()">✔ Problem Solved</button>
+            <a class="action-button call" href="tel:${customer.phone}">📞 CALL</a>
+            <a class="action-button email" href="${mailLink}" target="_blank">✉️ Gmail</a>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderList(customers) {
+      const list = document.getElementById('queue-list');
+      if (customers.length === 0) {
+        list.innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">📭</div>
+            Queue is empty
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = customers.map((c, i) => {
+        const waitTime = Math.floor((Date.now() - new Date(c.createdAt).getTime()) / 1000);
+        const isSelected = selectedCustomerId === c._id;
+        return `
+          <div class="queue-item ${c.priority}${isSelected ? ' selected' : ''}" onclick="selectCustomer('${c._id}')">
+            <div class="queue-item-header">
+              <div class="queue-item-name">#${i + 1} — ${c.name}</div>
+              <div class="queue-item-priority ${c.priority}">${c.priority.toUpperCase()}</div>
+            </div>
+            <div class="queue-item-issue">📌 ${c.issue}</div>
+            <div class="queue-item-meta">
+              <span>📱 ${c.phone}</span>
+              <span>⏱ ${formatWaitTime(waitTime)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectCustomer(id) {
+      selectedCustomerId = selectedCustomerId === id ? null : id;
+      if (lastQueueData) renderQueue(lastQueueData);
+    }
+
+    function renderServed(served) {
+      const list = document.getElementById('served-list');
+      if (served.length === 0) {
+        list.innerHTML = `<div style="text-align:center;padding:14px;color:var(--muted);font-size:12px;font-family:'JetBrains Mono',monospace;">// no customers served yet</div>`;
+        return;
+      }
+
+      list.innerHTML = served.map(c => {
+        const servedTime = new Date(c.servedAt).toLocaleTimeString();
+        const duration = Math.floor((new Date(c.servedAt) - new Date(c.createdAt)) / 1000);
+        return `
+          <div class="served-item">
+            <div class="served-item-name">✅ ${c.name}</div>
+            <div class="served-item-time">📍 Served at ${servedTime} • Duration: ${formatWaitTime(duration)}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function markProblemSolved() {
+      return await serveNext(true);
+    }
+
+    async function serveNext(isSolvedButton = false) {
+      const token = localStorage.getItem('token');
+      const btn = document.getElementById('serve-btn');
+      const msgDiv = document.getElementById('serve-message');
+
+      btn.disabled = true;
+      btn.textContent = '⏳ Processing...';
+
+      try {
+        const body = selectedCustomerId ? { customerId: selectedCustomerId } : {};
+        const res = await fetch(`${API}/queue/serve`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          const verb = isSolvedButton ? 'marked as solved' : 'served';
+          msgDiv.innerHTML = `<div class="status-message success">✅ ${data.customer.name} has been ${verb}!</div>`;
+          setTimeout(() => {
+            msgDiv.innerHTML = '';
+            loadQueue();
+          }, 2000);
+        } else {
+          msgDiv.innerHTML = `<div class="status-message error">❌ ${data.message}</div>`;
+        }
+      } catch (err) {
+        msgDiv.innerHTML = `<div class="status-message error">❌ Error serving customer</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = selectedCustomerId ? '✅ Serve Selected Customer' : '✅ Serve Next Customer';
+      }
+    }
+
+    function formatWaitTime(seconds) {
+      if (seconds < 60) return seconds + 's';
+      if (seconds < 3600) return Math.floor(seconds / 60) + 'm';
+      return Math.floor(seconds / 3600) + 'h';
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login.html';
+    }
+
+    // Poll queue every 3 seconds
+    setInterval(loadQueue, 3000);
+  </script>
+
+</body>
+</html>

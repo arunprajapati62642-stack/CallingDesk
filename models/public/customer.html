@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CallDesk — Customer Portal</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Outfit", sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    header {
+      background: white;
+      padding: 16px 24px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-mark {
+      font-size: 28px;
+    }
+
+    .logo-name {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .logo-name span {
+      color: #667eea;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .user-info {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .user-info .name {
+      font-weight: 700;
+      color: #333;
+    }
+
+    .logout-btn {
+      background: #e5e5e5;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: #d0d0d0;
+    }
+
+    .page-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+
+    .page-title {
+      color: white;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 30px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    @media (max-width: 768px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #e5e5e5;
+      border-radius: 8px;
+      font-family: "Outfit", sans-serif;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .submit-btn.loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .status-box {
+      background: #f0f4ff;
+      border-left: 4px solid #667eea;
+      padding: 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .status-box.success {
+      background: #efe;
+      border-color: #3c3;
+      color: #3c3;
+    }
+
+    .status-box.error {
+      background: #fee;
+      border-color: #c33;
+      color: #c33;
+    }
+
+    .queue-item {
+      background: #f9f9f9;
+      padding: 12px;
+      border-radius: 6px;
+      border-left: 4px solid #667eea;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .queue-item-no {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+
+    .queue-item-issue {
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 30px;
+      color: #999;
+    }
+
+    .empty-state-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <div class="logo-mark">🎧</div>
+      <div class="logo-name">Call<span>Desk</span></div>
+    </div>
+    <div class="header-right">
+      <div class="user-info">
+        <div>👤 Welcome, <span class="name" id="user-name">User</span></div>
+      </div>
+      <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+  </header>
+
+  <div class="page-container">
+    <h1 class="page-title">📞 Register Your Complaint</h1>
+
+    <div class="content-grid">
+      <!-- REGISTER COMPLAINT FORM -->
+      <div class="card">
+        <div class="card-title">📝 New Complaint</div>
+
+        <div id="form-message"></div>
+
+        <form onsubmit="submitComplaint(event)">
+          <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" id="form-name" placeholder="Your Name" required>
+          </div>
+
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="form-phone" placeholder="+91 98XXXXXXXX" required>
+          </div>
+
+          <div class="form-group">
+            <label>Gmail Address</label>
+            <input type="email" id="form-email" placeholder="you@gmail.com" required>
+          </div>
+
+          <div class="form-group">
+            <label>Issue Description</label>
+            <textarea id="form-issue" placeholder="Describe your complaint or issue..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Priority Level</label>
+            <select id="form-priority" required>
+              <option value="normal">🟡 Normal - Can Wait</option>
+              <option value="high">🔴 High - Urgent</option>
+              <option value="low">🔵 Low - Not Urgent</option>
+            </select>
+          </div>
+
+          <button type="submit" class="submit-btn">📞 Register to Queue</button>
+        </form>
+
+      </div>
+
+      <!-- QUEUE STATUS -->
+      <div class="card">
+        <div class="card-title">📊 Queue Status</div>
+
+        <div class="stat-item">
+          <div class="stat-value" id="queue-position">—</div>
+          <div class="stat-label">Your Position</div>
+        </div>
+
+        <div class="stat-item">
+          <div class="stat-value" id="queue-size">0</div>
+          <div class="stat-label">Total in Queue</div>
+        </div>
+
+        <div id="queue-status" class="status-box">
+          ⏳ Click "Refresh" to check your position in the queue.
+        </div>
+
+        <button class="submit-btn" style="background: #999;" onclick="refreshQueue()">🔄 Refresh Status</button>
+      </div>
+    </div>
+
+    <!-- QUEUE LIST -->
+    <div class="card">
+      <div class="card-title">⏳ Current Queue</div>
+      <div id="queue-list">
+        <div class="empty-state">
+          <div class="empty-state-icon">📭</div>
+          Queue is empty
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:3000/api';
+    let currentUser = null;
+    let myComplaintId = null;
+
+    // Check authentication
+    window.addEventListener('load', () => {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+
+      if (!token || !user) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      const userData = JSON.parse(user);
+      
+      // Only customers can access this page
+      if (userData.role !== 'customer') {
+        window.location.href = '/queue.html';
+        return;
+      }
+
+      currentUser = userData;
+      document.getElementById('user-name').textContent = userData.name;
+      document.getElementById('form-name').value = userData.name;
+      if (userData.email) {
+        document.getElementById('form-email').value = userData.email;
+      }
+
+      // Load queue
+      refreshQueue();
+    });
+
+    async function submitComplaint(e) {
+      e.preventDefault();
+      const token = localStorage.getItem('token');
+      const btn = event.target.querySelector('button');
+      const messageDiv = document.getElementById('form-message');
+
+      const complaint = {
+        name: document.getElementById('form-name').value,
+        phone: document.getElementById('form-phone').value,
+        email: document.getElementById('form-email').value,
+        issue: document.getElementById('form-issue').value,
+        priority: document.getElementById('form-priority').value
+      };
+
+      btn.classList.add('loading');
+      btn.textContent = '⏳ Registering...';
+
+      try {
+        const res = await fetch(`${API}/queue`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(complaint)
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          messageDiv.innerHTML = '<div class="status-box success">✅ Your complaint has been registered! You are in the queue.</div>';
+          e.target.reset();
+          document.getElementById('form-name').value = currentUser.name;
+          myComplaintId = data.customer._id;
+          setTimeout(() => refreshQueue(), 1000);
+        } else {
+          messageDiv.innerHTML = `<div class="status-box error">❌ ${data.message}</div>`;
+        }
+      } catch (err) {
+        messageDiv.innerHTML = '<div class="status-box error">❌ Error registering complaint. Try again.</div>';
+      } finally {
+        btn.classList.remove('loading');
+        btn.textContent = '📞 Register to Queue';
+      }
+    }
+
+    async function refreshQueue() {
+      try {
+        const res = await fetch(`${API}/queue`);
+        const data = await res.json();
+
+        if (data.success) {
+          document.getElementById('queue-size').textContent = data.queueSize;
+
+          // Render queue
+          const queueHtml = data.customers.length > 0 ? 
+            data.customers.map((c, i) => `
+              <div class="queue-item">
+                <span class="queue-item-no">#${i + 1}</span>
+                <strong>${c.name}</strong>
+                <div class="queue-item-issue">📞 ${c.phone} • ${c.issue}</div>
+              </div>
+            `).join('') : 
+            '<div class="empty-state"><div class="empty-state-icon">📭</div> Queue is empty</div>';
+
+          document.getElementById('queue-list').innerHTML = queueHtml;
+
+          // Update user status
+          const position = data.customers.findIndex(c => c.email === currentUser.email);
+          if (position >= 0) {
+            document.getElementById('queue-position').textContent = position + 1;
+            document.getElementById('queue-status').innerHTML = 
+              `<strong>Your Position:</strong> #${position + 1} in queue ⏳`;
+          } else {
+            document.getElementById('queue-position').textContent = '—';
+            document.getElementById('queue-status').innerHTML = 
+              'You are not currently in the queue. <strong>Register above to join!</strong>';
+          }
+        }
+      } catch (err) {
+        console.error('Error loading queue:', err);
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login.html';
+    }
+
+    // Poll queue every 5 seconds
+    setInterval(refreshQueue, 5000);
+  </script>
+
+</body>
+</html>
